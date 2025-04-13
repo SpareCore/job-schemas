@@ -22,6 +22,7 @@ Job Schemas is the foundation layer of the GoPine distributed computing system. 
 Job Schemas are imported and utilized by both the Node Agent and Job Server components, acting as the binding contract that ensures proper communication across the distributed system.
 
 ## Technical Details
+- **Tech Stack**: JSON, YAML
 - Language-agnostic schema definitions
 - Versioned contracts to enable backward compatibility
 - Validation rules for data integrity
