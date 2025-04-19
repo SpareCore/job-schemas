@@ -1,0 +1,244 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoPine Job-Related Message Schemas",
+  "description": "Schemas for job request, assignment, status update, and result messages",
+  
+  "definitions": {
+    "job_request_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "job_request"
+        },
+        "payload": {
+          "type": "object",
+          "oneOf": [
+            { "$ref": "ocr-job-schema.json" },
+            { "$ref": "pdf-parse-job-schema.json" }
+          ]
+        }
+      }
+    },
+    
+    "job_assignment_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "job_assignment"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "job_id",
+            "node_id"
+          ],
+          "properties": {
+            "job_id": {
+              "type": "string",
+              "description": "Unique identifier for the job being assigned"
+            },
+            "node_id": {
+              "type": "string",
+              "description": "Unique identifier for the node agent assigned to the job"
+            },
+            "job_data": {
+              "type": "object",
+              "description": "Complete job data including all parameters",
+              "oneOf": [
+                { "$ref": "ocr-job-schema.json" },
+                { "$ref": "pdf-parse-job-schema.json" }
+              ]
+            },
+            "input_file_transfer": {
+              "type": "object",
+              "description": "Information for transferring input files if needed",
+              "properties": {
+                "transfer_method": {
+                  "type": "string",
+                  "enum": ["url", "base64", "file_server"]
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Source URL or path for the input file"
+                },
+                "authentication": {
+                  "type": "object",
+                  "description": "Authentication details if required"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "job_status_update_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "job_status_update"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "job_id",
+            "status",
+            "node_id"
+          ],
+          "properties": {
+            "job_id": {
+              "type": "string",
+              "description": "Unique identifier for the job"
+            },
+            "node_id": {
+              "type": "string",
+              "description": "Unique identifier for the node agent processing the job"
+            },
+            "status": {
+              "type": "string",
+              "description": "Current status of the job",
+              "enum": ["queued", "assigned", "downloading", "processing", "uploading", "completed", "failed", "canceled"]
+            },
+            "progress": {
+              "type": "number",
+              "description": "Progress percentage (0-100)",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "status_message": {
+              "type": "string",
+              "description": "Human-readable status message"
+            },
+            "error": {
+              "type": "object",
+              "description": "Error information if job status is 'failed'"
+            },
+            "estimated_completion_time": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Estimated time when the job will complete"
+            }
+          }
+        }
+      }
+    },
+    
+    "job_result_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "job_result"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "job_id",
+            "node_id",
+            "status",
+            "processing_stats"
+          ],
+          "properties": {
+            "job_id": {
+              "type": "string",
+              "description": "Unique identifier for the job"
+            },
+            "node_id": {
+              "type": "string",
+              "description": "Unique identifier for the node agent that processed the job"
+            },
+            "status": {
+              "type": "string",
+              "description": "Final status of the job",
+              "enum": ["completed", "failed", "partial"]
+            },
+            "result": {
+              "type": "object",
+              "description": "Job-specific result data based on job type",
+              "oneOf": [
+                { 
+                  "type": "object",
+                  "properties": {
+                    "$ref": "ocr-job-schema.json#/properties/result/properties"
+                  }
+                },
+                { 
+                  "type": "object",
+                  "properties": {
+                    "$ref": "pdf-parse-job-schema.json#/properties/result/properties"
+                  }
+                }
+              ]
+            },
+            "output_file_transfer": {
+              "type": "object",
+              "description": "Information about where/how to access the output files",
+              "properties": {
+                "transfer_method": {
+                  "type": "string",
+                  "enum": ["url", "base64", "file_server"]
+                },
+                "location": {
+                  "type": "string",
+                  "description": "URL or path to the output file"
+                },
+                "expiration": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the output file will expire or be deleted"
+                }
+              }
+            },
+            "processing_stats": {
+              "type": "object",
+              "description": "Statistics about the job processing",
+              "properties": {
+                "processing_time_seconds": {
+                  "type": "number",
+                  "description": "Total processing time in seconds"
+                },
+                "cpu_usage_percent_avg": {
+                  "type": "number",
+                  "description": "Average CPU usage during processing"
+                },
+                "memory_usage_mb_max": {
+                  "type": "number",
+                  "description": "Maximum memory usage during processing in MB"
+                }
+              }
+            },
+            "error": {
+              "type": "object",
+              "description": "Error information if job status is 'failed'",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "Error code"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                },
+                "details": {
+                  "type": "object",
+                  "description": "Additional error details"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

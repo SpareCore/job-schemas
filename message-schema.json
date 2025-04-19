@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoPine Message Schema",
+  "description": "Base schema for all messages exchanged between components in the GoPine system",
+  "type": "object",
+  "required": [
+    "message_id",
+    "message_type",
+    "timestamp",
+    "sender",
+    "payload"
+  ],
+  "properties": {
+    "message_id": {
+      "type": "string",
+      "description": "Unique identifier for the message"
+    },
+    "message_type": {
+      "type": "string",
+      "description": "Type of message",
+      "enum": [
+        "node_registration",
+        "node_heartbeat",
+        "node_status_update",
+        "job_request",
+        "job_assignment",
+        "job_status_update",
+        "job_result",
+        "system_notification",
+        "error_report"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the message was created"
+    },
+    "sender": {
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the sender"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the sender",
+          "enum": [
+            "node_agent",
+            "job_server",
+            "dashboard"
+          ]
+        }
+      }
+    },
+    "recipient": {
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the recipient (if directed message)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the recipient",
+          "enum": [
+            "node_agent",
+            "job_server",
+            "dashboard",
+            "broadcast"
+          ]
+        }
+      }
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Identifier that correlates related messages (e.g., request/response pairs)"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Message-specific content"
+    }
+  },
+  "additionalProperties": false
+}

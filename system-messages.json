@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoPine System Message Schemas",
+  "description": "Schemas for system-wide notifications and error reports",
+  
+  "definitions": {
+    "system_notification_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "system_notification"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "notification_type",
+            "message"
+          ],
+          "properties": {
+            "notification_type": {
+              "type": "string",
+              "description": "Type of system notification",
+              "enum": [
+                "system_startup",
+                "system_shutdown",
+                "maintenance_scheduled",
+                "maintenance_completed",
+                "version_update",
+                "config_change",
+                "performance_alert",
+                "security_alert",
+                "information"
+              ]
+            },
+            "severity": {
+              "type": "string",
+              "description": "Severity level of the notification",
+              "enum": ["info", "warning", "error", "critical"],
+              "default": "info"
+            },
+            "message": {
+              "type": "string",
+              "description": "Human-readable notification message"
+            },
+            "affected_components": {
+              "type": "array",
+              "description": "System components affected by this notification",
+              "items": {
+                "type": "string",
+                "enum": ["job_server", "node_agents", "dashboard", "all"]
+              }
+            },
+            "action_required": {
+              "type": "boolean",
+              "description": "Indicates whether action is required from users or administrators",
+              "default": false
+            },
+            "scheduled_time": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Scheduled time for the event (if applicable)"
+            },
+            "estimated_duration": {
+              "type": "integer",
+              "description": "Estimated duration of the event in minutes (if applicable)"
+            },
+            "details": {
+              "type": "object",
+              "description": "Additional notification-specific details"
+            }
+          }
+        }
+      }
+    },
+    
+    "error_report_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "error_report"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "error_type",
+            "error_message",
+            "component",
+            "severity"
+          ],
+          "properties": {
+            "error_type": {
+              "type": "string",
+              "description": "Type of error"
+            },
+            "error_message": {
+              "type": "string",
+              "description": "Human-readable error message"
+            },
+            "component": {
+              "type": "string",
+              "description": "Component where the error occurred",
+              "enum": ["job_server", "node_agent", "dashboard"]
+            },
+            "severity": {
+              "type": "string",
+              "description": "Severity level of the error",
+              "enum": ["low", "medium", "high", "critical"]
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the error occurred"
+            },
+            "context": {
+              "type": "object",
+              "description": "Contextual information about what was happening when the error occurred"
+            },
+            "related_entity": {
+              "type": "object",
+              "description": "Information about the entity related to the error (if applicable)",
+              "properties": {
+                "entity_type": {
+                  "type": "string",
+                  "enum": ["job", "node", "user", "system"]
+                },
+                "entity_id": {
+                  "type": "string",
+                  "description": "Identifier for the related entity"
+                }
+              }
+            },
+            "stack_trace": {
+              "type": "string",
+              "description": "Stack trace or error details for debugging"
+            },
+            "auto_resolution_attempted": {
+              "type": "boolean",
+              "description": "Whether automatic resolution was attempted",
+              "default": false
+            },
+            "resolution_steps": {
+              "type": "array",
+              "description": "Steps that can be taken to resolve the error",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

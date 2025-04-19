@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoPine Node-Related Message Schemas",
+  "description": "Schemas for node registration, heartbeat, and status update messages",
+  
+  "definitions": {
+    "node_registration_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "node_registration"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "node_id",
+            "hostname",
+            "capabilities",
+            "resource_info"
+          ],
+          "properties": {
+            "node_id": {
+              "type": "string",
+              "description": "Unique identifier for the node agent"
+            },
+            "hostname": {
+              "type": "string",
+              "description": "Hostname of the computer running the node agent"
+            },
+            "ip_address": {
+              "type": "string",
+              "description": "IP address of the node agent"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version of the node agent software"
+            },
+            "capabilities": {
+              "type": "array",
+              "description": "List of job types this node can process",
+              "items": {
+                "type": "string",
+                "enum": ["ocr", "pdf_parse"]
+              }
+            },
+            "resource_info": {
+              "type": "object",
+              "description": "Information about available computing resources",
+              "properties": {
+                "cpu_cores": {
+                  "type": "integer",
+                  "description": "Number of CPU cores"
+                },
+                "cpu_model": {
+                  "type": "string",
+                  "description": "CPU model information"
+                },
+                "total_memory_mb": {
+                  "type": "number",
+                  "description": "Total RAM in megabytes"
+                },
+                "available_memory_mb": {
+                  "type": "number",
+                  "description": "Available RAM in megabytes"
+                },
+                "available_disk_space_mb": {
+                  "type": "number",
+                  "description": "Available disk space in megabytes"
+                },
+                "operating_system": {
+                  "type": "string",
+                  "description": "Operating system information"
+                }
+              }
+            },
+            "time_restrictions": {
+              "type": "object",
+              "description": "Time restrictions for job processing",
+              "properties": {
+                "available_hours": {
+                  "type": "array",
+                  "description": "Hours during which this node can process jobs (24-hour format)",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "day_of_week": {
+                        "type": "string",
+                        "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Weekdays", "Weekends", "All"]
+                      },
+                      "start_time": {
+                        "type": "string",
+                        "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+                        "description": "Start time in 24-hour format (HH:MM)"
+                      },
+                      "end_time": {
+                        "type": "string",
+                        "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+                        "description": "End time in 24-hour format (HH:MM)"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "node_heartbeat_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "node_heartbeat"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "node_id",
+            "status",
+            "current_load"
+          ],
+          "properties": {
+            "node_id": {
+              "type": "string",
+              "description": "Unique identifier for the node agent"
+            },
+            "status": {
+              "type": "string",
+              "description": "Current status of the node",
+              "enum": ["online", "busy", "idle", "going_offline"]
+            },
+            "current_load": {
+              "type": "object",
+              "description": "Current resource usage",
+              "properties": {
+                "cpu_percent": {
+                  "type": "number",
+                  "description": "Current CPU usage percentage",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "memory_percent": {
+                  "type": "number",
+                  "description": "Current memory usage percentage",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "available_memory_mb": {
+                  "type": "number",
+                  "description": "Available memory in megabytes"
+                },
+                "active_jobs": {
+                  "type": "integer",
+                  "description": "Number of jobs currently being processed"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "node_status_update_message": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "message-schema.json" }
+      ],
+      "properties": {
+        "message_type": {
+          "const": "node_status_update"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "node_id",
+            "status"
+          ],
+          "properties": {
+            "node_id": {
+              "type": "string",
+              "description": "Unique identifier for the node agent"
+            },
+            "status": {
+              "type": "string",
+              "description": "Updated status of the node",
+              "enum": ["online", "busy", "idle", "offline", "error", "maintenance"]
+            },
+            "reason": {
+              "type": "string",
+              "description": "Reason for the status change"
+            },
+            "estimated_return_time": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Estimated time when the node will return to service (if applicable)"
+            },
+            "error_details": {
+              "type": "object",
+              "description": "Details about any error condition"
+            }
+          }
+        }
+      }
+    }
+  }
+}

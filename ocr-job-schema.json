@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoPine OCR Job Schema",
+  "description": "Schema for OCR (Optical Character Recognition) jobs in the GoPine system",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "job-schema.json"
+    }
+  ],
+  "properties": {
+    "job_type": {
+      "const": "ocr"
+    },
+    "parameters": {
+      "type": "object",
+      "required": [
+        "input_file",
+        "output_format"
+      ],
+      "properties": {
+        "input_file": {
+          "type": "string",
+          "description": "Path or URL to the image or PDF file to perform OCR on"
+        },
+        "output_format": {
+          "type": "string",
+          "description": "Desired format for the OCR output",
+          "enum": ["txt", "json", "docx", "pdf", "csv"],
+          "default": "txt"
+        },
+        "language": {
+          "type": "string",
+          "description": "Language of the text to be recognized",
+          "default": "eng"
+        },
+        "dpi": {
+          "type": "integer",
+          "description": "DPI to use for processing",
+          "minimum": 72,
+          "maximum": 1200,
+          "default": 300
+        },
+        "page_range": {
+          "type": "string",
+          "description": "Range of pages to process (e.g., '1-5', '1,3,5')",
+          "default": "all"
+        },
+        "preprocessing": {
+          "type": "object",
+          "description": "Preprocessing options for the image",
+          "properties": {
+            "grayscale": {
+              "type": "boolean",
+              "default": true
+            },
+            "denoise": {
+              "type": "boolean",
+              "default": false
+            },
+            "deskew": {
+              "type": "boolean",
+              "default": true
+            },
+            "contrast_enhance": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "advanced_options": {
+          "type": "object",
+          "description": "Advanced OCR engine-specific options",
+          "properties": {
+            "engine": {
+              "type": "string",
+              "enum": ["tesseract", "ocr_space", "azure", "google"],
+              "default": "tesseract"
+            },
+            "psm": {
+              "type": "integer",
+              "description": "Page segmentation mode (Tesseract-specific)",
+              "minimum": 0,
+              "maximum": 13,
+              "default": 3
+            },
+            "oem": {
+              "type": "integer",
+              "description": "OCR Engine mode (Tesseract-specific)",
+              "minimum": 0,
+              "maximum": 3,
+              "default": 3
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "output_file": {
+          "type": "string",
+          "description": "Path to the resulting output file"
+        },
+        "text_content": {
+          "type": "string",
+          "description": "Extracted text content (if small enough to include directly)"
+        },
+        "pages_processed": {
+          "type": "integer",
+          "description": "Number of pages that were processed"
+        },
+        "characters_recognized": {
+          "type": "integer",
+          "description": "Number of characters recognized"
+        },
+        "confidence_score": {
+          "type": "number",
+          "description": "Overall confidence score of the OCR result (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "processing_time_seconds": {
+          "type": "number",
+          "description": "Time taken to process the OCR job in seconds"
+        },
+        "page_details": {
+          "type": "array",
+          "description": "Detailed results for each page",
+          "items": {
+            "type": "object",
+            "properties": {
+              "page_number": {
+                "type": "integer"
+              },
+              "confidence_score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "word_count": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

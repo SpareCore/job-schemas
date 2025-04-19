@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoPine Base Job Schema",
+  "description": "Base schema for all job types in the GoPine distributed computing system",
+  "type": "object",
+  "required": [
+    "job_id",
+    "job_type",
+    "priority",
+    "status",
+    "created_at",
+    "submitted_by",
+    "parameters"
+  ],
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "description": "Unique identifier for the job"
+    },
+    "job_type": {
+      "type": "string",
+      "description": "Type of job (e.g., 'ocr', 'pdf_parse')",
+      "enum": ["ocr", "pdf_parse"]
+    },
+    "priority": {
+      "type": "integer",
+      "description": "Job priority (1-10, with 10 being highest)",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 5
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the job",
+      "enum": ["queued", "assigned", "processing", "completed", "failed", "canceled"]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the job was created"
+    },
+    "submitted_by": {
+      "type": "string",
+      "description": "ID or username of the user who submitted the job"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "ID of the node agent assigned to process the job",
+      "default": null
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when job processing started"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when job processing completed"
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Job-specific parameters"
+    },
+    "result": {
+      "type": "object",
+      "description": "Job result data"
+    },
+    "error": {
+      "type": "object",
+      "description": "Error information if job failed",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Error code"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message"
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional error details"
+        }
+      }
+    },
+    "retry_count": {
+      "type": "integer",
+      "description": "Number of times this job has been retried",
+      "minimum": 0,
+      "default": 0
+    },
+    "max_retries": {
+      "type": "integer",
+      "description": "Maximum number of retries allowed for this job",
+      "minimum": 0,
+      "default": 3
+    },
+    "timeout_seconds": {
+      "type": "integer",
+      "description": "Maximum time in seconds job is allowed to run before timing out",
+      "minimum": 0,
+      "default": 3600
+    },
+    "tags": {
+      "type": "array",
+      "description": "Custom tags for categorizing and filtering jobs",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "additionalProperties": false
+}

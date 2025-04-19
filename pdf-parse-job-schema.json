@@ -1,0 +1,225 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GoPine PDF Parsing Job Schema",
+  "description": "Schema for PDF parsing jobs in the GoPine system",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "job-schema.json"
+    }
+  ],
+  "properties": {
+    "job_type": {
+      "const": "pdf_parse"
+    },
+    "parameters": {
+      "type": "object",
+      "required": [
+        "input_file",
+        "extraction_tasks"
+      ],
+      "properties": {
+        "input_file": {
+          "type": "string",
+          "description": "Path or URL to the PDF file to parse"
+        },
+        "extraction_tasks": {
+          "type": "array",
+          "description": "List of data extraction tasks to perform on the PDF",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "task_type"
+            ],
+            "properties": {
+              "task_type": {
+                "type": "string",
+                "description": "Type of extraction task",
+                "enum": ["text", "tables", "forms", "images", "metadata", "structure"]
+              },
+              "page_range": {
+                "type": "string",
+                "description": "Range of pages to process (e.g., '1-5', '1,3,5')",
+                "default": "all"
+              }
+            }
+          }
+        },
+        "output_format": {
+          "type": "string",
+          "description": "Format for the parsed output",
+          "enum": ["json", "csv", "xlsx", "txt", "xml"],
+          "default": "json"
+        },
+        "password": {
+          "type": "string",
+          "description": "Password if the PDF is protected"
+        },
+        "table_extraction_options": {
+          "type": "object",
+          "description": "Options for table extraction",
+          "properties": {
+            "algorithm": {
+              "type": "string",
+              "enum": ["lattice", "stream", "ai"],
+              "default": "lattice"
+            },
+            "include_headers": {
+              "type": "boolean",
+              "default": true
+            },
+            "format_tables": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "text_extraction_options": {
+          "type": "object",
+          "description": "Options for text extraction",
+          "properties": {
+            "preserve_formatting": {
+              "type": "boolean",
+              "default": true
+            },
+            "include_line_breaks": {
+              "type": "boolean",
+              "default": true
+            },
+            "extract_font_info": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "form_extraction_options": {
+          "type": "object",
+          "description": "Options for form field extraction",
+          "properties": {
+            "include_field_properties": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "output_files": {
+          "type": "object",
+          "description": "Paths to the extracted output files by task type",
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "tables": {
+              "type": "string"
+            },
+            "forms": {
+              "type": "string"
+            },
+            "images": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "string"
+            },
+            "structure": {
+              "type": "string"
+            }
+          }
+        },
+        "pages_processed": {
+          "type": "integer",
+          "description": "Number of pages that were processed"
+        },
+        "processing_time_seconds": {
+          "type": "number",
+          "description": "Time taken to process the PDF parsing job in seconds"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Extracted PDF metadata",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "author": {
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "keywords": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "creator": {
+              "type": "string"
+            },
+            "producer": {
+              "type": "string"
+            },
+            "creation_date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "modification_date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "page_count": {
+              "type": "integer"
+            }
+          }
+        },
+        "task_results": {
+          "type": "object",
+          "description": "Summary of results for each extraction task",
+          "properties": {
+            "text": {
+              "type": "object",
+              "properties": {
+                "character_count": {
+                  "type": "integer"
+                },
+                "word_count": {
+                  "type": "integer"
+                }
+              }
+            },
+            "tables": {
+              "type": "object",
+              "properties": {
+                "tables_extracted": {
+                  "type": "integer"
+                }
+              }
+            },
+            "forms": {
+              "type": "object",
+              "properties": {
+                "fields_extracted": {
+                  "type": "integer"
+                }
+              }
+            },
+            "images": {
+              "type": "object",
+              "properties": {
+                "images_extracted": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
