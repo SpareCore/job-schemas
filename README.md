@@ -1,10 +1,10 @@
-# GoPine Job Schemas
+# Job Schemas
 
 ## Overview
-Job Schemas is the foundation layer of the GoPine distributed computing system. It defines standardized schemas, message formats, and contracts to ensure seamless communication between all components of the system.
+Job Schemas is the foundation layer of the SpareCore distributed computing system. It defines standardized schemas, message formats, and contracts to ensure seamless communication between all components of the system.
 
 ## Purpose
-- Provides a shared language for job definitions across the entire GoPine ecosystem
+- Provides a shared language for job definitions across the entire SpareCore ecosystem
 - Ensures data consistency and compatibility between node agents and the job server
 - Establishes standard formats for common distributed computing tasks
 
